@@ -1,0 +1,23 @@
+[
+  {
+    "id": "RAIN_01",
+    "name": "Heavy Rainfall in Zone A",
+    "event_type": "heavy_rainfall",
+    "starting_asset": "D04",
+    "severity": 9
+  },
+  {
+    "id": "ROAD_01",
+    "name": "Central Link Road Closure",
+    "event_type": "road_closure",
+    "starting_asset": "R17",
+    "severity": 7
+  },
+  {
+    "id": "POWER_01",
+    "name": "Power Node Failure",
+    "event_type": "power_failure",
+    "starting_asset": "E02",
+    "severity": 8
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "source": "D04",
+    "target": "R17",
+    "relation": "drains_corridor",
+    "weight": 0.90
+  },
+  {
+    "source": "R17",
+    "target": "J03",
+    "relation": "feeds_traffic_into",
+    "weight": 0.85
+  },
+  {
+    "source": "J03",
+    "target": "H02",
+    "relation": "provides_access_to",
+    "weight": 0.95
+  },
+  {
+    "source": "W03",
+    "target": "R17",
+    "relation": "crosses_below",
+    "weight": 0.75
+  },
+  {
+    "source": "E02",
+    "target": "J03",
+    "relation": "powers",
+    "weight": 0.90
+  }
+]

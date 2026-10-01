@@ -1,0 +1,68 @@
+[
+  {
+    "id": "D04",
+    "name": "Central Drain",
+    "type": "drainage",
+    "zone": "Zone A",
+    "criticality": 8,
+    "condition": 55,
+    "department": "Drainage",
+    "latitude": 17.4401,
+    "longitude": 78.3489
+  },
+  {
+    "id": "R17",
+    "name": "Central Link Road",
+    "type": "road",
+    "zone": "Zone A",
+    "criticality": 8,
+    "condition": 70,
+    "department": "Municipal",
+    "latitude": 17.4410,
+    "longitude": 78.3500
+  },
+  {
+    "id": "J03",
+    "name": "Central Junction",
+    "type": "junction",
+    "zone": "Zone A",
+    "criticality": 8,
+    "condition": 80,
+    "department": "Traffic",
+    "latitude": 17.4420,
+    "longitude": 78.3510
+  },
+  {
+    "id": "H02",
+    "name": "City Care Hospital",
+    "type": "hospital",
+    "zone": "Zone A",
+    "criticality": 10,
+    "condition": 90,
+    "department": "Health",
+    "latitude": 17.4430,
+    "longitude": 78.3520
+  },
+  {
+    "id": "W03",
+    "name": "Main Water Pipeline",
+    "type": "water",
+    "zone": "Zone A",
+    "criticality": 7,
+    "condition": 72,
+    "department": "Water",
+    "latitude": 17.4405,
+    "longitude": 78.3495
+  },
+  {
+    "id": "E02",
+    "name": "Zone A Power Node",
+    "type": "power",
+    "zone": "Zone A",
+    "criticality": 9,
+    "condition": 82,
+    "department": "Electricity",
+    "latitude": 17.4425,
+    "longitude": 78.3498
+  }
+]
