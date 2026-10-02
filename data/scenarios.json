@@ -4,20 +4,59 @@
     "name": "Heavy Rainfall in Zone A",
     "event_type": "heavy_rainfall",
     "starting_asset": "D04",
-    "severity": 9
+    "severity": 9,
+    "zone": "Zone A",
+    "duration_minutes": 60,
+    "description": "Heavy rainfall may overload drainage and affect roads, traffic and emergency access."
   },
   {
-    "id": "ROAD_01",
-    "name": "Central Link Road Closure",
-    "event_type": "road_closure",
+    "id": "FIRE_01",
+    "name": "Urban Fire in Zone A",
+    "event_type": "urban_fire",
     "starting_asset": "R17",
-    "severity": 7
+    "severity": 9,
+    "zone": "Zone A",
+    "duration_minutes": 45,
+    "description": "An urban fire may affect nearby roads, traffic movement, power infrastructure and emergency access."
   },
   {
     "id": "POWER_01",
-    "name": "Power Node Failure",
+    "name": "Power Failure in Zone A",
     "event_type": "power_failure",
     "starting_asset": "E02",
-    "severity": 8
+    "severity": 8,
+    "zone": "Zone A",
+    "duration_minutes": 90,
+    "description": "A power node failure may disrupt connected services and critical infrastructure."
+  },
+  {
+    "id": "WATER_01",
+    "name": "Water Pipeline Burst in Zone A",
+    "event_type": "pipeline_burst",
+    "starting_asset": "D04",
+    "severity": 8,
+    "zone": "Zone A",
+    "duration_minutes": 75,
+    "description": "A major pipeline failure may cause waterlogging, road disruption and service interruptions."
+  },
+  {
+    "id": "ROAD_01",
+    "name": "Major Road Accident in Zone A",
+    "event_type": "road_accident",
+    "starting_asset": "R17",
+    "severity": 7,
+    "zone": "Zone A",
+    "duration_minutes": 40,
+    "description": "A major road incident may cause congestion and delay access to critical services."
+  },
+  {
+    "id": "HEAT_01",
+    "name": "Extreme Heat in Zone A",
+    "event_type": "extreme_heat",
+    "starting_asset": "E02",
+    "severity": 8,
+    "zone": "Zone A",
+    "duration_minutes": 180,
+    "description": "Extreme heat may increase electricity demand and place additional pressure on critical services."
   }
 ]

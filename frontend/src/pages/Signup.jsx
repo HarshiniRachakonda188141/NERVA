@@ -21,20 +21,20 @@ export default function Signup() {
       name: "",
       email: "",
       password: "",
-      role: "Municipal"
     });
 
   const [error, setError] =
     useState("");
 
+  const [loading, setLoading] =
+    useState(false);
 
-  function update(
-    event
-  ) {
+
+  function update(event) {
     setForm({
       ...form,
       [event.target.name]:
-        event.target.value
+        event.target.value,
     });
   }
 
@@ -46,16 +46,31 @@ export default function Signup() {
 
     try {
       setError("");
+      setLoading(true);
 
-      await signup(form);
+      await signup({
+        name: form.name,
+        email: form.email,
+        password: form.password,
 
-      navigate("/login");
+        // Public registration is
+        // always Citizen Access.
+        role: "citizen",
+      });
+
+      navigate(
+        "/login",
+        { replace: true }
+      );
 
     } catch (err) {
       setError(
         err.response?.data?.detail
         || "Unable to create account."
       );
+
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -63,8 +78,9 @@ export default function Signup() {
   return (
     <main className="auth-page">
       <section className="auth-card">
+
         <span className="eyebrow">
-          CREATE ACCESS
+          CITIZEN ACCESS
         </span>
 
         <h1>
@@ -72,14 +88,16 @@ export default function Signup() {
         </h1>
 
         <p>
-          Prototype department
-          access.
+          Create a citizen account to
+          view city alerts, report local
+          issues and track your reports.
         </p>
 
         <form
           className="auth-form"
           onSubmit={handleSubmit}
         >
+
           <label>
             Name
 
@@ -87,9 +105,11 @@ export default function Signup() {
               name="name"
               value={form.name}
               onChange={update}
+              autoComplete="name"
               required
             />
           </label>
+
 
           <label>
             Email
@@ -99,9 +119,11 @@ export default function Signup() {
               type="email"
               value={form.email}
               onChange={update}
+              autoComplete="email"
               required
             />
           </label>
+
 
           <label>
             Password
@@ -112,39 +134,28 @@ export default function Signup() {
               minLength="6"
               value={form.password}
               onChange={update}
+              autoComplete="new-password"
               required
             />
           </label>
 
-          <label>
-            Department
 
-            <select
-              name="role"
-              value={form.role}
-              onChange={update}
-            >
-              <option>
-                Municipal
-              </option>
+          <div className="access-info">
+            <span>
+              Account type
+            </span>
 
-              <option>
-                Drainage
-              </option>
+            <strong>
+              Citizen Access
+            </strong>
 
-              <option>
-                Traffic
-              </option>
+            <p>
+              Government and Field Team
+              accounts are issued separately
+              by authorized administrators.
+            </p>
+          </div>
 
-              <option>
-                Emergency
-              </option>
-
-              <option>
-                Health
-              </option>
-            </select>
-          </label>
 
           {error && (
             <p className="error-text">
@@ -152,12 +163,19 @@ export default function Signup() {
             </p>
           )}
 
+
           <button
+            type="submit"
             className="primary-button wide"
+            disabled={loading}
           >
-            Create prototype access
+            {loading
+              ? "Creating account..."
+              : "Create Citizen Account"}
           </button>
+
         </form>
+
 
         <p className="auth-switch">
           Already registered?
@@ -168,6 +186,7 @@ export default function Signup() {
             Sign in
           </Link>
         </p>
+
       </section>
     </main>
   );

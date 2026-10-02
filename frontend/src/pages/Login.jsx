@@ -1,23 +1,24 @@
 import {
-  useState
+  useState,
 } from "react";
 
 import {
+  Link,
   useNavigate,
-  Link
 } from "react-router-dom";
 
 import {
   ArrowRight,
-  LockKeyhole
+  LoaderCircle,
+  LockKeyhole,
 } from "lucide-react";
 
 import {
-  login as loginRequest
+  login as loginRequest,
 } from "../services/api";
 
 import {
-  useAuth
+  useAuth,
 } from "../context/AuthContext";
 
 
@@ -25,20 +26,70 @@ export default function Login() {
   const navigate =
     useNavigate();
 
-  const { login } =
-    useAuth();
+  const {
+    login,
+  } = useAuth();
 
-  const [email, setEmail] =
-    useState("");
 
-  const [password, setPassword] =
-    useState("");
+  const [
+    email,
+    setEmail,
+  ] = useState("");
 
-  const [error, setError] =
-    useState("");
+  const [
+    password,
+    setPassword,
+  ] = useState("");
 
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+
+  function redirectByRole(role) {
+    switch (role) {
+      case "city_command":
+        navigate(
+          "/pulse",
+          {
+            replace: true,
+          }
+        );
+        break;
+
+      case "field_team":
+        navigate(
+          "/field",
+          {
+            replace: true,
+          }
+        );
+        break;
+
+      case "citizen":
+        navigate(
+          "/citizen",
+          {
+            replace: true,
+          }
+        );
+        break;
+
+      default:
+        navigate(
+          "/",
+          {
+            replace: true,
+          }
+        );
+    }
+  }
 
 
   async function handleSubmit(
@@ -50,25 +101,61 @@ export default function Login() {
       setError("");
       setLoading(true);
 
+
+      const normalizedEmail =
+        email
+          .trim()
+          .toLowerCase();
+
+
       const data =
         await loginRequest({
-          email,
-          password
+          email:
+            normalizedEmail,
+
+          password,
         });
 
-      localStorage.setItem(
-        "nerva_token",
+
+      if (
+        !data?.user ||
+        !data?.user?.role
+      ) {
+        throw new Error(
+          "Account role is missing."
+        );
+      }
+
+
+      /*
+        AuthContext stores both:
+
+        nerva_user
+        nerva_token
+      */
+      login(
+        data.user,
         data.token
       );
 
-      login(data.user);
 
-      navigate("/pulse");
+      redirectByRole(
+        data.user.role
+      );
 
     } catch (err) {
+      console.error(
+        "Login failed:",
+        err
+      );
+
+
       setError(
-        err.response?.data?.detail
-        || "Unable to login."
+        err.response
+          ?.data
+          ?.detail ||
+        err.message ||
+        "Unable to login."
       );
 
     } finally {
@@ -79,42 +166,62 @@ export default function Login() {
 
   return (
     <main className="auth-page">
+
       <div className="auth-orb">
-        <span>N</span>
+        <span>
+          N
+        </span>
       </div>
 
+
       <section className="auth-card">
+
         <span className="eyebrow">
           NERVA ACCESS
         </span>
+
 
         <h1>
           Welcome back.
         </h1>
 
+
         <p>
-          Enter the city's
-          intelligence layer.
+          Access the NERVA service
+          assigned to your account.
         </p>
 
+
         <form
-          onSubmit={handleSubmit}
+          onSubmit={
+            handleSubmit
+          }
           className="auth-form"
         >
+
           <label>
             Email
 
             <input
               type="email"
               value={email}
-              onChange={(event) =>
+              autoComplete="email"
+              placeholder={
+                "name@example.com"
+              }
+              onChange={(
+                event
+              ) =>
                 setEmail(
-                  event.target.value
+                  event
+                    .target
+                    .value
                 )
               }
               required
             />
           </label>
+
 
           <label>
             Password
@@ -122,14 +229,25 @@ export default function Login() {
             <input
               type="password"
               value={password}
-              onChange={(event) =>
+              autoComplete={
+                "current-password"
+              }
+              placeholder={
+                "Enter password"
+              }
+              onChange={(
+                event
+              ) =>
                 setPassword(
-                  event.target.value
+                  event
+                    .target
+                    .value
                 )
               }
               required
             />
           </label>
+
 
           {error && (
             <p className="error-text">
@@ -137,25 +255,40 @@ export default function Login() {
             </p>
           )}
 
+
           <button
-            className="primary-button wide"
+            type="submit"
+            className={
+              "primary-button wide"
+            }
             disabled={loading}
           >
-            <LockKeyhole
-              size={17}
-            />
+            {loading ? (
+              <>
+                <LoaderCircle
+                  className="spin"
+                  size={17}
+                />
 
-            {loading
-              ? "Entering..."
-              : "Enter NERVA"}
+                Entering...
+              </>
+            ) : (
+              <>
+                <LockKeyhole
+                  size={17}
+                />
 
-            {!loading && (
-              <ArrowRight
-                size={17}
-              />
+                Enter NERVA
+
+                <ArrowRight
+                  size={17}
+                />
+              </>
             )}
           </button>
+
         </form>
+
 
         <p className="auth-switch">
           New to NERVA?
@@ -166,7 +299,9 @@ export default function Login() {
             Create access
           </Link>
         </p>
+
       </section>
+
     </main>
   );
 }

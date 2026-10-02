@@ -1,13 +1,24 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export default function ProtectedRoute({
+
+export default function RoleRoute({
   children,
   allowedRoles = [],
 }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
-  // Not logged in
+  if (loading) {
+    return (
+      <div className="role-loading-screen">
+        <div className="role-loading-content">
+          <div className="role-loading-pulse" />
+          <p>Loading NERVA...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <Navigate
@@ -17,12 +28,20 @@ export default function ProtectedRoute({
     );
   }
 
-  // Logged in, but wrong role
   if (
     allowedRoles.length > 0 &&
     !allowedRoles.includes(user.role)
   ) {
-    if (user.role === "field") {
+    if (user.role === "citizen") {
+      return (
+        <Navigate
+          to="/citizen"
+          replace
+        />
+      );
+    }
+
+    if (user.role === "field_team") {
       return (
         <Navigate
           to="/field"
@@ -31,10 +50,10 @@ export default function ProtectedRoute({
       );
     }
 
-    if (user.role === "citizen") {
+    if (user.role === "city_command") {
       return (
         <Navigate
-          to="/citizen"
+          to="/pulse"
           replace
         />
       );

@@ -1,12 +1,13 @@
 import {
   useEffect,
-  useState
+  useState,
 } from "react";
 
 import {
   CloudRain,
   LoaderCircle,
-  Sparkles
+  RotateCcw,
+  Sparkles,
 } from "lucide-react";
 
 import BottomNav
@@ -22,76 +23,113 @@ import RainLayer
   from "../components/RainLayer";
 
 import {
-  runSimulation
+  runSimulation,
 } from "../services/api";
+
+
+const DEFAULT_SCENARIO =
+  "RAIN_01";
 
 
 export default function Nerva() {
   const [
     loading,
-    setLoading
+    setLoading,
   ] = useState(false);
 
   const [
     storm,
-    setStorm
+    setStorm,
   ] = useState(false);
 
   const [
     result,
-    setResult
+    setResult,
   ] = useState(null);
 
   const [
     tab,
-    setTab
+    setTab,
   ] = useState("next");
 
   const [
     activeNodes,
-    setActiveNodes
+    setActiveNodes,
   ] = useState([]);
 
   const [
     error,
-    setError
+    setError,
   ] = useState("");
 
+  const [
+    severity,
+    setSeverity,
+  ] = useState(8);
 
+
+  /*
+    Animate cascade assets one by one
+    after simulation data arrives.
+  */
   useEffect(() => {
     if (!result) {
+      setActiveNodes([]);
       return;
     }
+
+    const cascade =
+      Array.isArray(result.cascade)
+        ? result.cascade
+        : [];
 
     setActiveNodes([]);
 
     const ids =
-      result.cascade.map(
-        (item) =>
-          item.asset_id
-      );
+      cascade
+        .map(
+          (item) =>
+            item.asset_id
+        )
+        .filter(Boolean);
 
     const timers = [];
+
 
     ids.forEach(
       (id, index) => {
         const timer =
-          setTimeout(() => {
-            setActiveNodes(
-              (previous) => [
-                ...previous,
-                id
-              ]
-            );
-          }, index * 700);
+          window.setTimeout(
+            () => {
+              setActiveNodes(
+                (previous) => {
+                  if (
+                    previous.includes(id)
+                  ) {
+                    return previous;
+                  }
+
+                  return [
+                    ...previous,
+                    id,
+                  ];
+                }
+              );
+            },
+            index * 700
+          );
 
         timers.push(timer);
       }
     );
 
+
     return () => {
       timers.forEach(
-        clearTimeout
+        (timer) =>
+          window.clearTimeout(
+            timer
+          )
       );
     };
   }, [result]);
@@ -106,27 +144,47 @@ export default function Nerva() {
       setStorm(true);
       setTab("next");
 
+
+      /*
+        Small delay is intentionally
+        retained for the prototype
+        engine-reading animation.
+      */
       await new Promise(
         (resolve) =>
-          setTimeout(
+          window.setTimeout(
             resolve,
-            1800
+            900
           )
       );
 
+
       const data =
         await runSimulation(
-          "RAIN_01"
+          DEFAULT_SCENARIO,
+          severity
         );
+
+
+      if (!data) {
+        throw new Error(
+          "Simulation returned no data."
+        );
+      }
+
 
       setResult(data);
 
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Simulation failed:",
+        error
+      );
 
       setStorm(false);
 
       setError(
+        error.response?.data?.detail ||
         "NERVA Engine is unavailable."
       );
 
@@ -136,8 +194,26 @@ export default function Nerva() {
   }
 
 
+  function resetSimulation() {
+    setResult(null);
+    setActiveNodes([]);
+    setStorm(false);
+    setTab("next");
+    setError("");
+  }
+
+
   return (
-    <main className="app-shell simulation-shell">
+    <main
+      className={
+        "app-shell simulation-shell"
+      }
+    >
+
+      {/* ======================================
+          HEADER
+      ====================================== */}
+
       <header className="floating-header">
         <div>
           <span className="brand-mini">
@@ -150,14 +226,21 @@ export default function Nerva() {
           </p>
         </div>
 
+
         <div className="system-online">
           <span />
+
           MODEL MODE
         </div>
       </header>
 
 
+      {/* ======================================
+          SIMULATION ENVIRONMENT
+      ====================================== */}
+
       <section className="simulation-page">
+
         <CityNetwork
           mode="neural"
           activeNodes={
@@ -165,13 +248,19 @@ export default function Nerva() {
           }
         />
 
+
         <RainLayer
           active={storm}
         />
 
 
+        {/* ==================================
+            SCENARIO LAUNCHER
+        ================================== */}
+
         {!result && (
           <div className="scenario-launcher">
+
             <Sparkles
               size={22}
             />
@@ -180,19 +269,73 @@ export default function Nerva() {
               WHAT HAPPENS IF...
             </span>
 
+
             <h1>
               Heavy rainfall hits
               Zone A?
             </h1>
 
+
             <p>
               Watch NERVA trace a
-              possible chain reaction
+              modelled chain reaction
               through connected urban
               infrastructure.
             </p>
 
+
+            {/* SEVERITY */}
+
+            <div
+              style={{
+                width: "100%",
+                marginTop: "18px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent:
+                    "space-between",
+                  alignItems:
+                    "center",
+                  marginBottom:
+                    "8px",
+                }}
+              >
+                <span className="eyebrow">
+                  EVENT SEVERITY
+                </span>
+
+                <strong>
+                  {severity}/10
+                </strong>
+              </div>
+
+
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={severity}
+                disabled={loading}
+                onChange={(event) =>
+                  setSeverity(
+                    Number(
+                      event.target
+                        .value
+                    )
+                  )
+                }
+                style={{
+                  width: "100%",
+                }}
+              />
+            </div>
+
+
             <button
+              type="button"
               className="scenario-button"
               onClick={
                 handleSimulation
@@ -219,25 +362,72 @@ export default function Nerva() {
               )}
             </button>
 
+
             {error && (
-              <p className="error-text">
+              <div className="response-error">
                 {error}
-              </p>
+              </div>
             )}
+
+
+            <small
+              className="model-disclaimer"
+            >
+              Simulation outputs are
+              modelled prototype
+              information and are not
+              guaranteed real-world
+              forecasts.
+            </small>
+
           </div>
         )}
 
 
+        {/* ==================================
+            SIMULATION RESULT
+        ================================== */}
+
         {result && (
-          <CascadeSheet
-            result={result}
-            tab={tab}
-            setTab={setTab}
-          />
+          <>
+            <button
+              type="button"
+              className="response-center-trigger"
+              onClick={
+                resetSimulation
+              }
+              style={{
+                position: "absolute",
+                top: "90px",
+                right: "20px",
+                zIndex: 900,
+              }}
+            >
+              <RotateCcw
+                size={16}
+              />
+
+              New Simulation
+            </button>
+
+
+            <CascadeSheet
+              result={result}
+              tab={tab}
+              setTab={setTab}
+              scenarioId={
+                result?.scenario?.id ||
+                DEFAULT_SCENARIO
+              }
+            />
+          </>
         )}
+
       </section>
 
+
       <BottomNav />
+
     </main>
   );
 }
