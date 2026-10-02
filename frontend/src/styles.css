@@ -43,7 +43,7 @@
       rgba(1, 8, 18, 0.08) 50%,
       rgba(2, 8, 18, 0.42) 100%
     ),
-    url("/Hyderabad%20Cyber-Noir%20Cityscape(1).png");
+    url("/city-bg.png");
 
   background-position: center center;
   background-size: cover;
