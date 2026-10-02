@@ -77,6 +77,9 @@ export default function Signup() {
 
   return (
     <main className="auth-page">
+      <div className="auth-orb">
+        <span>N</span>
+      </div>
       <section className="auth-card">
 
         <span className="eyebrow">
