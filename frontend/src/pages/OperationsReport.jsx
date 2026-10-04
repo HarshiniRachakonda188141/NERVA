@@ -1,0 +1,800 @@
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
+import {
+  ArrowLeft,
+  Activity,
+  AlertTriangle,
+  Building2,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardList,
+  Clock3,
+  Download,
+  FileText,
+  HardHat,
+  Radio,
+  RefreshCw,
+  ShieldCheck,
+  Siren,
+  Users,
+  Waves,
+  Zap,
+} from "lucide-react";
+
+export default function OperationsReport() {
+  const navigate = useNavigate();
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState("Just now");
+  const [filter, setFilter] = useState("All");
+
+  const stats = [
+    {
+      label: "Citizen Signals",
+      value: "18",
+      detail: "Last 24 hours",
+      icon: Radio,
+    },
+    {
+      label: "Active Alerts",
+      value: "03",
+      detail: "1 high priority",
+      icon: AlertTriangle,
+    },
+    {
+      label: "Field Teams",
+      value: "07",
+      detail: "5 currently active",
+      icon: HardHat,
+    },
+    {
+      label: "Resolved",
+      value: "12",
+      detail: "Today",
+      icon: CheckCircle2,
+    },
+  ];
+
+  const departments = [
+    {
+      name: "Municipal Administration",
+      status: "Responding",
+      tasks: 4,
+      completion: 76,
+      icon: Building2,
+    },
+    {
+      name: "Traffic Police",
+      status: "Monitoring",
+      tasks: 3,
+      completion: 64,
+      icon: Activity,
+    },
+    {
+      name: "Emergency Services",
+      status: "Ready",
+      tasks: 2,
+      completion: 92,
+      icon: Siren,
+    },
+    {
+      name: "Power Operations",
+      status: "Stable",
+      tasks: 1,
+      completion: 96,
+      icon: Zap,
+    },
+  ];
+
+  const incidents = [
+    {
+      id: "NRV-1042",
+      title: "Drainage capacity approaching threshold",
+      zone: "Zone A · Central Hyderabad",
+      department: "Municipal Administration",
+      severity: "High",
+      status: "Active",
+      time: "8 min ago",
+      icon: Waves,
+    },
+    {
+      id: "NRV-1039",
+      title: "Traffic density increasing near affected corridor",
+      zone: "Zone A · Mobility corridor",
+      department: "Traffic Police",
+      severity: "Medium",
+      status: "Monitoring",
+      time: "14 min ago",
+      icon: Activity,
+    },
+    {
+      id: "NRV-1035",
+      title: "Citizen waterlogging signal verified",
+      zone: "Zone A · Low-lying road",
+      department: "Field Response",
+      severity: "Medium",
+      status: "Assigned",
+      time: "21 min ago",
+      icon: Radio,
+    },
+    {
+      id: "NRV-1028",
+      title: "Emergency route assessment completed",
+      zone: "Zone A · Critical route",
+      department: "Emergency Services",
+      severity: "Low",
+      status: "Resolved",
+      time: "36 min ago",
+      icon: ShieldCheck,
+    },
+  ];
+
+  const timeline = [
+    {
+      time: "20:08",
+      title: "NERVA cascade analysis completed",
+      description:
+        "Rainfall-to-emergency-service dependency chain analysed.",
+      type: "model",
+    },
+    {
+      time: "20:10",
+      title: "Drainage inspection recommended",
+      description:
+        "High-risk drainage segments prioritised for field verification.",
+      type: "alert",
+    },
+    {
+      time: "20:13",
+      title: "Traffic coordination initiated",
+      description:
+        "Mobility corridor monitoring activated for possible diversion.",
+      type: "action",
+    },
+    {
+      time: "20:17",
+      title: "Field team assigned",
+      description:
+        "Response unit dispatched to verify reported water accumulation.",
+      type: "team",
+    },
+  ];
+
+  const filteredIncidents = useMemo(() => {
+    if (filter === "All") {
+      return incidents;
+    }
+
+    return incidents.filter(
+      (incident) => incident.status === filter
+    );
+  }, [filter]);
+
+  function refreshReport() {
+    if (refreshing) return;
+
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setRefreshing(false);
+      setLastUpdated("Just now");
+    }, 900);
+  }
+
+  function generateReport() {
+    const lines = [
+      "NERVA — CITY OPERATIONS REPORT",
+      "Hyderabad Urban Resilience Prototype",
+      "",
+      "CITY RESILIENCE SCORE: 82/100",
+      "STATUS: Stable — 1 system requires attention",
+      "",
+      "SUMMARY",
+      "Citizen Signals: 18",
+      "Active Alerts: 03",
+      "Field Teams: 07",
+      "Resolved Today: 12",
+      "",
+      "PRIORITY INCIDENTS",
+      ...incidents.map(
+        (incident) =>
+          `${incident.id} | ${incident.severity} | ${incident.status} | ${incident.title}`
+      ),
+      "",
+      "NERVA PREDICTION",
+      "Heavy Rainfall → Drainage Stress → Waterlogging Risk → Traffic Disruption → Emergency Delay",
+      "",
+      "RECOMMENDATION",
+      "Cross-department intervention recommended.",
+      "",
+      "Prototype report generated by NERVA.",
+    ];
+
+    const blob = new Blob([lines.join("\n")], {
+      type: "text/plain;charset=utf-8",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "NERVA-Operations-Report.txt";
+
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <main className="operations-page">
+
+      {/* =========================================
+          HEADER
+      ========================================== */}
+
+      <header className="operations-header">
+
+        <div className="operations-brand">
+
+          <button
+            className="operations-back"
+            onClick={() => navigate("/command")}
+            aria-label="Back to command dashboard"
+          >
+            <ArrowLeft size={20} />
+          </button>
+
+          <div className="operations-logo">
+            <FileText size={24} />
+          </div>
+
+          <div>
+            <strong>NERVA</strong>
+            <span>Operations Intelligence</span>
+          </div>
+
+        </div>
+
+        <div className="operations-header-actions">
+
+          <div className="operations-live">
+            <span />
+            LIVE OPERATIONS
+          </div>
+
+          <button
+            className="operations-refresh"
+            onClick={refreshReport}
+          >
+            <RefreshCw
+              size={17}
+              className={
+                refreshing
+                  ? "operations-spin"
+                  : ""
+              }
+            />
+
+            Refresh
+          </button>
+
+        </div>
+
+      </header>
+
+
+      <div className="operations-container">
+
+        {/* =========================================
+            HERO
+        ========================================== */}
+
+        <motion.section
+          className="operations-hero"
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.55,
+          }}
+        >
+
+          <div>
+
+            <span className="operations-eyebrow">
+              CITY INTELLIGENCE REPORT
+            </span>
+
+            <h1>
+              Operational
+              <span> picture.</span>
+            </h1>
+
+            <p>
+              A consolidated view of citizen signals,
+              predicted infrastructure risks, field
+              operations and coordinated city response.
+            </p>
+
+          </div>
+
+
+          <div className="report-summary-card">
+
+            <div className="report-summary-top">
+
+              <div>
+                <span>CITY RESILIENCE</span>
+                <strong>82</strong>
+                <small>/100</small>
+              </div>
+
+              <Activity size={27} />
+
+            </div>
+
+            <div className="report-summary-status">
+
+              <span className="stable-dot" />
+
+              <div>
+                <strong>Stable</strong>
+                <small>
+                  1 system requires attention
+                </small>
+              </div>
+
+            </div>
+
+            <div className="report-updated">
+              <Clock3 size={13} />
+              Updated {lastUpdated}
+            </div>
+
+          </div>
+
+        </motion.section>
+
+
+        {/* =========================================
+            STATS
+        ========================================== */}
+
+        <section className="operations-stats">
+
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+
+            return (
+              <motion.article
+                key={stat.label}
+                className="operations-stat-card"
+                initial={{
+                  opacity: 0,
+                  y: 20,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  delay: 0.1 + index * 0.08,
+                }}
+              >
+
+                <div className="operations-stat-icon">
+                  <Icon size={21} />
+                </div>
+
+                <div>
+                  <strong>
+                    {stat.value}
+                  </strong>
+
+                  <span>
+                    {stat.label}
+                  </span>
+
+                  <small>
+                    {stat.detail}
+                  </small>
+                </div>
+
+              </motion.article>
+            );
+          })}
+
+        </section>
+
+
+        {/* =========================================
+            MAIN GRID
+        ========================================== */}
+
+        <section className="operations-grid">
+
+          {/* PRIORITY INCIDENTS */}
+
+          <article className="operations-panel incidents-panel">
+
+            <div className="operations-panel-heading">
+
+              <div>
+                <span>
+                  RESPONSE STATUS
+                </span>
+
+                <h2>
+                  Priority Incidents
+                </h2>
+              </div>
+
+              <AlertTriangle size={21} />
+
+            </div>
+
+
+            <div className="incident-filters">
+
+              {[
+                "All",
+                "Active",
+                "Monitoring",
+                "Assigned",
+                "Resolved",
+              ].map((item) => (
+                <button
+                  key={item}
+                  className={
+                    filter === item
+                      ? "incident-filter active"
+                      : "incident-filter"
+                  }
+                  onClick={() =>
+                    setFilter(item)
+                  }
+                >
+                  {item}
+                </button>
+              ))}
+
+            </div>
+
+
+            <div className="incident-list">
+
+              {filteredIncidents.map(
+                (incident) => {
+                  const Icon =
+                    incident.icon;
+
+                  return (
+                    <motion.div
+                      key={incident.id}
+                      className="incident-row"
+                      layout
+                      initial={{
+                        opacity: 0,
+                      }}
+                      animate={{
+                        opacity: 1,
+                      }}
+                    >
+
+                      <div className="incident-icon">
+                        <Icon size={19} />
+                      </div>
+
+                      <div className="incident-copy">
+
+                        <div className="incident-id">
+                          {incident.id}
+                        </div>
+
+                        <strong>
+                          {incident.title}
+                        </strong>
+
+                        <span>
+                          {incident.zone}
+                        </span>
+
+                        <small>
+                          {incident.department}
+                          {" · "}
+                          {incident.time}
+                        </small>
+
+                      </div>
+
+                      <div className="incident-tags">
+
+                        <span
+                          className={`severity ${incident.severity.toLowerCase()}`}
+                        >
+                          {incident.severity}
+                        </span>
+
+                        <span className="incident-status">
+                          {incident.status}
+                        </span>
+
+                      </div>
+
+                    </motion.div>
+                  );
+                }
+              )}
+
+            </div>
+
+          </article>
+
+
+          {/* RESPONSE TIMELINE */}
+
+          <article className="operations-panel timeline-panel">
+
+            <div className="operations-panel-heading">
+
+              <div>
+                <span>
+                  COORDINATED RESPONSE
+                </span>
+
+                <h2>
+                  Activity Timeline
+                </h2>
+              </div>
+
+              <Clock3 size={21} />
+
+            </div>
+
+
+            <div className="operations-timeline">
+
+              {timeline.map(
+                (item, index) => (
+                  <div
+                    className="timeline-item"
+                    key={
+                      item.time +
+                      item.title
+                    }
+                  >
+
+                    <div className="timeline-marker">
+
+                      <span />
+
+                      {index <
+                        timeline.length -
+                          1 && <i />}
+
+                    </div>
+
+                    <div className="timeline-content">
+
+                      <small>
+                        {item.time}
+                      </small>
+
+                      <strong>
+                        {item.title}
+                      </strong>
+
+                      <p>
+                        {item.description}
+                      </p>
+
+                    </div>
+
+                  </div>
+                )
+              )}
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        {/* =========================================
+            DEPARTMENT COORDINATION
+        ========================================== */}
+
+        <section className="operations-panel department-panel">
+
+          <div className="operations-panel-heading">
+
+            <div>
+              <span>
+                CROSS-DEPARTMENT RESPONSE
+              </span>
+
+              <h2>
+                Department Coordination
+              </h2>
+            </div>
+
+            <Users size={21} />
+
+          </div>
+
+
+          <div className="department-grid">
+
+            {departments.map(
+              (department) => {
+                const Icon =
+                  department.icon;
+
+                return (
+                  <div
+                    className="department-card"
+                    key={department.name}
+                  >
+
+                    <div className="department-top">
+
+                      <div className="department-icon">
+                        <Icon size={19} />
+                      </div>
+
+                      <span>
+                        {department.status}
+                      </span>
+
+                    </div>
+
+                    <strong>
+                      {department.name}
+                    </strong>
+
+                    <small>
+                      {department.tasks} active
+                      operational tasks
+                    </small>
+
+                    <div className="department-progress">
+
+                      <div>
+                        <span>
+                          Response readiness
+                        </span>
+
+                        <strong>
+                          {department.completion}%
+                        </strong>
+                      </div>
+
+                      <div className="department-track">
+                        <span
+                          style={{
+                            width:
+                              `${department.completion}%`,
+                          }}
+                        />
+                      </div>
+
+                    </div>
+
+                  </div>
+                );
+              }
+            )}
+
+          </div>
+
+        </section>
+
+
+        {/* =========================================
+            NERVA PREDICTION SUMMARY
+        ========================================== */}
+
+        <section className="report-prediction">
+
+          <div className="report-prediction-icon">
+            <ShieldCheck size={27} />
+          </div>
+
+          <div className="report-prediction-copy">
+
+            <span>
+              NERVA PREDICTIVE SUMMARY
+            </span>
+
+            <h2>
+              Cross-department intervention
+              recommended.
+            </h2>
+
+            <p>
+              Heavy rainfall may increase drainage
+              stress, creating waterlogging risk,
+              mobility disruption and potential
+              emergency-response delays.
+            </p>
+
+            <div className="prediction-chain">
+
+              <span>Heavy Rainfall</span>
+              <ChevronRight size={14} />
+
+              <span>Drainage Stress</span>
+              <ChevronRight size={14} />
+
+              <span>Waterlogging</span>
+              <ChevronRight size={14} />
+
+              <span>Traffic</span>
+              <ChevronRight size={14} />
+
+              <span>Emergency Delay</span>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        {/* =========================================
+            REPORT ACTION
+        ========================================== */}
+
+        <section className="operations-report-action">
+
+          <div>
+
+            <ClipboardList size={24} />
+
+            <div>
+              <strong>
+                City Operations Report
+              </strong>
+
+              <span>
+                Generate a prototype summary of
+                the current NERVA operational
+                picture.
+              </span>
+            </div>
+
+          </div>
+
+
+          <button onClick={generateReport}>
+
+            <Download size={18} />
+
+            Generate Report
+
+          </button>
+
+        </section>
+
+
+        <p className="operations-disclaimer">
+          NERVA prototype outputs are modelled
+          decision-support information and are not
+          guaranteed real-world forecasts.
+        </p>
+
+      </div>
+
+    </main>
+  );
+}
